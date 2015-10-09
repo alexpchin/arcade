@@ -1,0 +1,20 @@
+html, body {
+  width: 100%;
+  height: 100%;
+}
+
+.hole {
+  border-radius: 100%;
+  background: white;
+  border: 2px solid black;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+}
+
+.pointer {
+  border-radius: 100%;
+  background: red;
+  position: absolute;
+  margin: 0;
+}
