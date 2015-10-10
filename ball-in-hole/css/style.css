@@ -17,4 +17,5 @@ html, body {
   background: red;
   position: absolute;
   margin: 0;
+  transition: transform .2s ease-in-out;
 }

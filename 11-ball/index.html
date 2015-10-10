@@ -1,0 +1,21 @@
+<!DOCTYPE>
+<html ng-app="elevenBallApp">
+<head>
+  <title>11 Ball</title>
+  <script src="bower_components/jquery/dist/jquery.js"></script>
+  <script src="bower_components/angular/angular.js"></script>
+  <script src="./js/app.js"></script>
+  <link rel="stylesheet" type="text/css" href="./css/style.css">
+</head>
+<body ng-controller="elevenBallController" ng-init="count=0">
+  
+  <div class="ballContainer">
+    <div ng-repeat="ball in balls track by $index" class="{{ball.color}} ball" ng-click="calculateBallTotal(ball.number, $event)">{{ball.number}}</div>
+  </div>
+
+  {{totalBallCount}}
+
+  <div class="nextBall">{{lastBall}}</div>
+  <div class="next" ng-click="nextBall()">Next Ball</div>
+</body>
+</html>

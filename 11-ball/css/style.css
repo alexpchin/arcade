@@ -1,0 +1,28 @@
+.ball {
+  width: 100px;
+  height: 100px;
+  border-radius: 100%;
+  border: 2px solid #000;
+  display: inline-block;
+  float: left;
+  color: white;
+  text-align: center;
+  line-height: 100px;
+}
+
+.ballContainer {
+  max-width: 600px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.red { background: red;}
+.yellow { background: yellow;}
+.blue { background: blue;}
+.green { background: green;}
+.pink { background: pink;}
+.black { background: black;}
+.orange { background: orange;}
+.brown { background: brown;}
+.lightblue { background: lightblue;}
+.purple { background: purple;}
