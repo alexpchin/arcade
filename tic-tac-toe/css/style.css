@@ -1,0 +1,22 @@
+body {
+  text-align: center;
+}
+
+ul {
+  margin: 0 auto;
+  overflow: hidden;
+  border: 1px solid #000;
+}
+
+li {
+  width: 98px;
+  height: 98px;
+  float: left;
+  border: 1px solid #000;
+  line-height: 98px;
+  font-size: 50px;
+}
+
+li:hover {
+  background: #99FF03;
+}
