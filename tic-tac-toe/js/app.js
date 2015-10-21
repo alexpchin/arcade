@@ -7,12 +7,12 @@ var TicTacToe = (function(){
 
     this.createBoard();
     this.possible      = this.generatePossibleMoves();
-    this.winConditions = this.generateWinConditions();
+    // this.winConditions = this.generateWinConditions();
     this.clear(); 
     this.start();
 
     // AI
-    // this.ai   = false;
+    this.ai   = true;
     // this.intelligence = 6;
   }
 
@@ -43,8 +43,17 @@ var TicTacToe = (function(){
     this.squares = document.getElementsByTagName("li");
   }
 
-  TicTacToe.prototype.generateWinConditions = function(){
-    var horizontal = this.generateHorizontalWins(this.possible);
+  // TicTacToe.prototype.generateWinConditions = function(){
+  //   var horizontal = this.generateHorizontalWins(this.possible);
+  //   var vertical   = this.generateVerticalWins(horizontal);
+  //   var diagonal   = this.generateDiagonalWins(horizontal);
+
+  //   return horizontal.concat(vertical).concat(diagonal);
+  // }
+
+  TicTacToe.prototype.generateBoardWinRows = function(board){
+    var board = board || this.board;
+    var horizontal = this.generateHorizontalWins(board);
     var vertical   = this.generateVerticalWins(horizontal);
     var diagonal   = this.generateDiagonalWins(horizontal);
 
@@ -111,12 +120,15 @@ var TicTacToe = (function(){
     square.innerHTML = this.player;
     this.message.innerHTML = this.player + " to play";
     
+    console.log(this.gameOver(this.board, this.player))
     if (this.gameOver(this.board, this.player)) {
       this.clear();
     } else {
       this.moveCounter++;
       if (this.ai) {
-        this.minimax(this.possible, 0);
+        var computer = this.player === "x" ? "o" : "x";
+        this.minimax(this.board, computer, 0);
+debugger
         // AI to go here?
         // Choose best square
         // square.innerHTML = "o";
@@ -133,23 +145,18 @@ var TicTacToe = (function(){
   }
 
   TicTacToe.prototype.checkForWin = function(board, player){
+    var board = this.generateBoardWinRows(board);
+
     var i = 0;
-    for (i; i < this.winConditions.length; i++) {
-      var counter = 0;
-      var w = 0;
-      for (w; w < this.winConditions[i].length; w++) {
-        var winConditionIndex = this.winConditions[i][w];
-        
-        if (board[winConditionIndex] === player) {
-          counter++;
-          if (counter === this.width) {
-            this.message.innerHTML = this.player + " Wins";
-            return true;
-          }
-        }
-      }
+    for (i; i < board.length; i++) {
+      if (board[i].reduce(function(a, b){return (a === b) ? a : false ; }) === player) return true;
     }
     return false;
+  }
+
+  TicTacToe.prototype.allAreEqual = function(array){
+    if (!array.length) return true;
+    return 
   }
 
   TicTacToe.prototype.checkForDraw = function(){
@@ -162,7 +169,8 @@ var TicTacToe = (function(){
     
   TicTacToe.prototype.clear = function(){
     this.moveCounter  = 0;
-    this.board        = new Array(this.width*this.width);
+    // this.board        = new Array(this.width*this.width);
+    this.board        = this.createArrayWithNulls(this.width*this.width, null);
     this.player       = "x";
     this.moves        = this.xMoves;
 
@@ -172,17 +180,30 @@ var TicTacToe = (function(){
     };
   }
 
+  TicTacToe.prototype.createArrayWithNulls = function(len, itm) {
+    var arr1 = [itm],
+    arr2 = [];
+    while (len > 0) {
+      if (len & 1) arr2 = arr2.concat(arr1);
+      arr1 = arr1.concat(arr1);
+      len >>>= 1;
+    }
+    return arr2;
+  }
+
   // AI
   TicTacToe.prototype.availableMoves = function(board){
-    var board = board || this.possible;
+    var board = board || this.board;
     return this.possible.filter(function(move) { 
-      if (typeof board[move] !== "undefined") return move;
+      if (board[move] === null) return move;
     });
   }
 
-  TicTacToe.prototype.newGameState = function(move, board){
+  TicTacToe.prototype.newGameState = function(move, player, board){
     var board = board || this.possible;
-    return board.push(move);
+    var clone = JSON.parse(JSON.stringify(board));
+    clone[move] = player; 
+    return clone;
   }
 
   TicTacToe.prototype.undoMove = function(move, board){
@@ -191,41 +212,52 @@ var TicTacToe = (function(){
     return board;
   }
 
-  TicTacToe.prototype.minimax = function(tempBoard, depth){
-    if (this.gameOver(tempBoard)) return score(tempBoard, depth);
+  TicTacToe.prototype.score = function(tempBoard, player, depth){
+    
+  }
+
+  TicTacToe.prototype.minimax = function(tempBoard, player, depth){
+    if (this.gameOver(tempBoard)) return this.score(tempBoard, player, depth);
+    console.log("Now ",  this.gameOver(tempBoard))
     
     depth+=1;
 
-    var scores = [];
-    var moves  = [];
-    var availableMoves = this.availableMoves(tempBoard);
-    var move, 
+    var scores = [],
+        moves  = [],
+        availableMoves = this.availableMoves(tempBoard),
+        move, 
         newState;
 
     for(var i=0; i < availableMoves.length; i++) {
       move = availableMoves[i];
-      newState = this.newGameState(move, tempBoard);
-      scores.push(minimax(newState, depth));
+      newState = this.newGameState(move, player, tempBoard);
+      console.log(newState);
+
+      // change player
+      player = (player === "x") ? "o" : "x";
+      scores.push(this.minimax(newState, player, depth));
+      
       moves.push(move); // Tried moves
       tempBoard = this.undoMove(move, tempBoard);
-      // change player
-      // player = (player === "x") ? "o" : "x";
     }
     
     var max_score, 
         max_score_index, 
         min_score,
-        min_score_index;
+        min_score_index,
+        choice;
     
-    if (active_turn === "COMPUTER") {
+    if (player === "o") {
       max_score = Math.max.apply(Math, scores);
       max_score_index = scores.indexOf(max_score);
       choice = moves[max_score_index];
+console.log("o: " +choice);
       return scores[max_score_index];
     } else {
       min_score = Math.min.apply(Math, scores);
       min_score_index = scores.indexOf(min_score);
       choice = moves[min_score_index];
+console.log("x: " +choice);
       return scores[min_score_index];
     }
   }
